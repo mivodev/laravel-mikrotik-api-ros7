@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mivo\LaravelMikrotikRos7\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Mivo\LaravelMikrotikRos7\MikrotikManager;
+use Mivo\MikrotikRos7\Client;
 
 /**
  * @method static \Mivo\MikrotikRos7\Client connection(string|array|null $name = null)
@@ -20,15 +22,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static array delete(string $endpoint, array $payload = [])
  * @method static array comm(string $command, array $params = [])
  *
- * @see \Mivo\LaravelMikrotikRos7\MikrotikManager
- * @see \Mivo\MikrotikRos7\Client
+ * @see MikrotikManager
+ * @see Client
  */
 class MikrotikRos7 extends Facade
 {
     /**
      * Get the registered name of the component.
-     *
-     * @return string
      */
     protected static function getFacadeAccessor(): string
     {

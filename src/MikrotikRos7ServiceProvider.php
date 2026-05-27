@@ -11,13 +11,11 @@ class MikrotikRos7ServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/mikrotik-ros7.php',
+            __DIR__.'/../config/mikrotik-ros7.php',
             'mikrotik-ros7'
         );
 
@@ -31,14 +29,12 @@ class MikrotikRos7ServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/mikrotik-ros7.php' => config_path('mikrotik-ros7.php'),
+                __DIR__.'/../config/mikrotik-ros7.php' => config_path('mikrotik-ros7.php'),
             ], 'mikrotik-ros7-config');
         }
     }

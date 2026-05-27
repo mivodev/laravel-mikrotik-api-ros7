@@ -28,13 +28,13 @@ return [
     'connections' => [
 
         'default' => [
-            'host'       => env('MIKROTIK_ROS7_HOST', '192.168.1.1'),
-            'username'   => env('MIKROTIK_ROS7_USERNAME', 'admin'),
-            'password'   => env('MIKROTIK_ROS7_PASSWORD', ''),
-            'port'       => env('MIKROTIK_ROS7_PORT', 443),
+            'host' => env('MIKROTIK_ROS7_HOST', '192.168.1.1'),
+            'username' => env('MIKROTIK_ROS7_USERNAME', 'admin'),
+            'password' => env('MIKROTIK_ROS7_PASSWORD', ''),
+            'port' => env('MIKROTIK_ROS7_PORT', 443),
             'verify_ssl' => env('MIKROTIK_ROS7_VERIFY_SSL', false),
-            'timeout'    => env('MIKROTIK_ROS7_TIMEOUT', 10),
-            'debug'      => env('MIKROTIK_ROS7_DEBUG', false),
+            'timeout' => env('MIKROTIK_ROS7_TIMEOUT', 10),
+            'debug' => env('MIKROTIK_ROS7_DEBUG', false),
         ],
 
     ],
