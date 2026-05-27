@@ -1,1 +1,84 @@
-# laravel-mikrotik-api-ros7
+# Laravel Mikrotik API ROS7
+
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.2-8892BF.svg)](https://php.net)
+[![Laravel Version](https://img.shields.io/badge/laravel-%3E%3D10.0-FF2D20.svg)](https://laravel.com)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+A clean, elegant Laravel wrapper for `mivodev/mikrotik-api-ros7`. Provides a ServiceProvider, Facade, configuration file, and Hybrid Connection Manager for seamless multi-tenant integration into your Laravel application.
+
+## Installation
+
+```bash
+composer require mivodev/laravel-mikrotik-api-ros7
+```
+
+Publish the configuration file:
+
+```bash
+php artisan vendor:publish --tag=mikrotik-ros7-config
+```
+
+## Configuration
+
+After publishing, you can configure your default router credentials in your `.env` file:
+
+```env
+MIKROTIK_ROS7_HOST=192.168.1.1
+MIKROTIK_ROS7_USERNAME=admin
+MIKROTIK_ROS7_PASSWORD=rahasia
+MIKROTIK_ROS7_PORT=443
+MIKROTIK_ROS7_VERIFY_SSL=false
+MIKROTIK_ROS7_TIMEOUT=10
+```
+
+## Usage
+
+Use the `MikrotikRos7` facade to easily communicate with your routers anywhere in your Laravel app.
+
+### Using Default Connection
+
+By default, the Facade uses the connection defined in `.env`.
+
+```php
+use Mivo\LaravelMikrotikRos7\Facades\MikrotikRos7;
+
+// Execute commands on the default router using Native REST
+$identity = MikrotikRos7::get('/rest/system/identity');
+
+// Or using Legacy CLI Mapping
+$users = MikrotikRos7::comm('/ip/hotspot/user/print');
+```
+
+### Hybrid Multi-Tenant Connections
+
+For SaaS platforms like **Mivo Enterprise**, you don't store router credentials in `.env`. Instead, you retrieve them dynamically from your database. The Manager supports passing an array directly to establish a dynamic, cached connection:
+
+```php
+use App\Models\Router;
+use Mivo\LaravelMikrotikRos7\Facades\MikrotikRos7;
+
+$router = Router::find(1);
+
+// Build connection dynamically from database model
+$client = MikrotikRos7::connection([
+    'host'       => $router->vpn_assigned_ip,
+    'username'   => $router->api_username,
+    'password'   => $router->api_password,
+    'port'       => 443,
+    'verify_ssl' => false,
+]);
+
+// Execute command on that specific router
+$activeUsers = $client->get('/rest/ip/hotspot/active');
+
+// Disconnect from the specific router
+$client->disconnect();
+```
+
+### Advanced Examples
+
+See the [core package documentation](https://github.com/mivodev/mikrotik-api-ros7) for full usage of the REST methods and the `comm()` legacy CLI mapping method.
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
