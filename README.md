@@ -35,25 +35,50 @@ MIKROTIK_ROS7_TIMEOUT=10
 
 ## Usage
 
-Use the `MikrotikRos7` facade to easily communicate with your routers anywhere in your Laravel app.
-
-### Using Default Connection
-
-By default, the Facade uses the connection defined in `.env`.
+### 1. REST-Native Service Managers (Sugar Syntax)
+Unlike legacy socket APIs, ROS7 uses native REST calls. This package provides 22 REST-native service managers using clean HTTP verbs under the hood, with full IPv4 & IPv6 support:
 
 ```php
 use Mivo\LaravelMikrotikRos7\Facades\MikrotikRos7;
 
-// Execute commands on the default router using Native REST
-$identity = MikrotikRos7::get('/rest/system/identity');
+// 1. Hotspot Management (REST GET / PUT)
+$users = MikrotikRos7::hotspot()->getUsers();
+MikrotikRos7::hotspot()->addUser([
+    'name' => 'dyzulk',
+    'password' => 'secret123',
+    'profile' => 'Premium-1M'
+]);
 
-// Or using Legacy CLI Mapping
-$users = MikrotikRos7::comm('/ip/hotspot/user/print');
+// 2. PPPoE Secret Management (REST GET / DELETE / POST)
+$activeSessions = MikrotikRos7::pppoe()->getActive();
+MikrotikRos7::pppoe()->disconnect('customer_123'); // Disconnects session by REST GET lookup + DELETE /rest/ppp/active/{.id}
+
+// 3. Simple Queues (REST PUT)
+MikrotikRos7::queue()->addSimpleQueue([
+    'name' => 'customer_123_limit',
+    'target' => '192.168.88.10',
+    'max-limit' => '1M/2M'
+]);
+
+// 4. Dual-Stack IPv4 / IPv6 Support (REST endpoints)
+MikrotikRos7::ipAddress()->addV6('2001:db8::1/64', 'ether1'); // REST PUT to /rest/ipv6/address
+MikrotikRos7::firewall()->addV6AddressList('blocked', '2001:db8::2'); // REST PUT to /rest/ipv6/firewall/address-list
 ```
 
-### Hybrid Multi-Tenant Connections
+Available managers: `arp()`, `bridge()`, `dhcp()`, `dns()`, `firewall()`, `hotspot()`, `interfaces()`, `ipAddress()`, `ipPool()`, `ntp()`, `pppoe()`, `queue()`, `radius()`, `routes()`, `routerUsers()`, `scripts()`, `sessionMonitor()`, `syslog()`, `system()`, `usageTracker()`, `vpn()`, `wireless()`.
 
-For SaaS platforms like **Mivo Enterprise**, you don't store router credentials in `.env`. Instead, you retrieve them dynamically from your database. The Manager supports passing an array directly to establish a dynamic, cached connection:
+### 2. Fluent REST Query Builder
+Query REST API resources using clean, fluent query strings instead of CLI parameters:
+
+```php
+$users = MikrotikRos7::query('/rest/ip/hotspot/user')
+    ->where('profile', 'Premium-1M')
+    ->select(['name', 'limit-uptime'])
+    ->get();
+```
+
+### 3. Hybrid Multi-Tenant Connections
+Perfect for SaaS applications (like Mivo Enterprise) where router credentials are retrieved dynamically from the database:
 
 ```php
 use App\Models\Router;
@@ -61,7 +86,7 @@ use Mivo\LaravelMikrotikRos7\Facades\MikrotikRos7;
 
 $router = Router::find(1);
 
-// Build connection dynamically from database model
+// Establish dynamic connection from database model
 $client = MikrotikRos7::connection([
     'host'       => $router->vpn_assigned_ip,
     'username'   => $router->api_username,
@@ -70,16 +95,30 @@ $client = MikrotikRos7::connection([
     'verify_ssl' => false,
 ]);
 
-// Execute command on that specific router
-$activeUsers = $client->get('/rest/ip/hotspot/active');
-
-// Disconnect from the specific router
-$client->disconnect();
+// Use any service manager on this specific router
+$users = $client->hotspot()->getUsers();
 ```
 
-### Advanced Examples
+---
 
-See the [core package documentation](https://github.com/mivodev/mikrotik-api-ros7) for full usage of the REST methods and the `comm()` legacy CLI mapping method.
+## 4. Interactive Artisan Diagnosis
+Diagnose and ping router connections easily using the Artisan tool:
+
+```bash
+# 1. Ping using a database Router ID
+php artisan mivo:ros7-ping 1
+
+# 2. Ping a manual host using options/flags (supports IP or Hostname/Domain)
+php artisan mivo:ros7-ping --host=192.168.88.1 --username=admin --password=secret --port=443
+
+# 3. Dynamic step-by-step interactive prompt (run without any arguments)
+php artisan mivo:ros7-ping
+```
+
+For a list of options and usage details, run:
+```bash
+php artisan mivo:ros7-ping --help
+```
 
 ## License
 
