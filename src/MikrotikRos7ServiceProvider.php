@@ -36,6 +36,10 @@ class MikrotikRos7ServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/mikrotik-ros7.php' => config_path('mikrotik-ros7.php'),
             ], 'mikrotik-ros7-config');
+
+            $this->commands([
+                Console\Commands\RouterPingCommand::class,
+            ]);
         }
     }
 }
