@@ -13,9 +13,7 @@ use Mivo\MikrotikRos7\Client;
  */
 class IpAddressManager
 {
-    public function __construct(protected Client $client)
-    {
-    }
+    public function __construct(protected Client $client) {}
 
     /**
      * @return array<int, array<string, string>>

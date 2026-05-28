@@ -26,9 +26,6 @@ class QueryBuilder
      */
     protected array $filters = [];
 
-    /**
-     * @var string|null
-     */
     protected ?string $proplist = null;
 
     public function __construct(
